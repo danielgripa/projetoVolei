@@ -16,13 +16,28 @@ Including another URLconf
 """
 
 from django.urls import path
-from Avaliacoes.views import alunos
+from Avaliacoes.views import alunos,avaliacoes,fundamentos,categoriasFundamento
 
 
 urlpatterns = [
+    #alunos
     path('api/alunos/', alunos.ListarAlunos.as_view(), name='listar_alunos'),
     path('api/alunos/adicionar/', alunos.AdicionarAluno.as_view(), name='adicionar_aluno'),
     path('api/alunos/<int:id>/', alunos.DetalhesAluno.as_view(), name='detalhes_aluno'),
-    # ... e assim por diante para as outras views
+    
+    #avaliacoes
+    path('api/avaliacoes/', avaliacoes.ListarAvaliacoes.as_view(), name='listar_avaliacoes'),
+    path('api/avaliacoes/adicionar/', avaliacoes.AdicionarAvaliacao.as_view(), name='adicionar_avaliacao'),
+    path('api/avaliacoes/<int:id>/', avaliacoes.DetalhesAvaliacao.as_view(), name='detalhes_avaliacao'),
+
+    #fundamentos
+    path('api/fundamentos/', fundamentos.ListarFundamentos.as_view(), name='listar_fundamentos'),
+    path('api/fundamentos/adicionar/', fundamentos.AdicionarFundamento.as_view(), name='adicionar_fundamento'),
+    path('api/fundamentos/<int:id>/', fundamentos.DetalhesFundamento.as_view(), name='detalhes_fundamento'),
+    
+    #categoriaFundamentos
+    path('api/categorias-fundamento/', categoriasFundamento.ListarCategoriasFundamento.as_view(), name='listar_categorias_fundamento'),
+    path('api/categorias-fundamento/adicionar/', categoriasFundamento.AdicionarCategoriaFundamento.as_view(), name='adicionar_categoria_fundamento'),
+    path('api/categorias-fundamento/<int:id>/', categoriasFundamento.DetalhesCategoriaFundamento.as_view(), name='detalhes_categoria_fundamento'),       
 ]
 

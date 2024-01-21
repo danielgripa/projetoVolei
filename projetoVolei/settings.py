@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'projetoVolei.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_USER','defaultUser'),
-        'USER': os.environ.get('DB_PASSWORD', 'defaultPassword'),
-        'PASSWORD': 'Volei@786',
+        'NAME':'VoleiDB',
+        'USER': os.environ.get('DB_USER','defaultUser'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'defaultPassword'),
         'HOST': 'localhost',  # Ou o endereço do seu servidor MySQL
         'PORT': '3306',  # Porta padrão do MySQL
     }

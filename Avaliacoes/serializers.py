@@ -1,7 +1,7 @@
 # Avaliacoes/serializers.py
 
 from rest_framework import serializers
-from .models import Aluno, Fundamento, Categoriafundamento, Ratingaluno
+from .models import Aluno, Fundamento, CategoriaFundamento, Avaliacao
 
 class AlunoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,10 +15,10 @@ class FundamentoSerializer(serializers.ModelSerializer):
 
 class CategoriaFundamentoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Categoriafundamento
+        model = CategoriaFundamento
         fields = '__all__'  # Ou especifique os campos que você deseja incluir
 
-class RatingalunoSerializer(serializers.ModelSerializer):
+class AvaliacaoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Ratingaluno
+        model = Avaliacao
         fields = '__all__'  # Ou especifique os campos que você deseja incluir

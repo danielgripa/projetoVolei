@@ -5,7 +5,6 @@ from ..models import Aluno
 from ..serializers import AlunoSerializer
 from django.http import Http404
 
-
 class AdicionarAluno(APIView):
     def post(self, request, format=None):
         serializer = AlunoSerializer(data=request.data)

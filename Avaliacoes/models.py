@@ -22,7 +22,7 @@ class Aluno(models.Model):
         db_table = 'aluno'
 
 
-class Categoriafundamento(models.Model):
+class CategoriaFundamento(models.Model):
     idcategoriafundamento = models.AutoField(db_column='idCategoriaFundamento', primary_key=True)  # Field name made lowercase.
     desc_categoriafundamento = models.CharField(db_column='desc_categoriaFundamento', max_length=255)  # Field name made lowercase.
 
@@ -34,14 +34,14 @@ class Categoriafundamento(models.Model):
 class Fundamento(models.Model):
     idfundamento = models.AutoField(db_column='idFundamento', primary_key=True)  # Field name made lowercase.
     desc_fundamento = models.CharField(db_column='desc_Fundamento', max_length=255)  # Field name made lowercase.
-    idcategoriafundamento = models.ForeignKey(Categoriafundamento, models.DO_NOTHING, db_column='idCategoriaFundamento', blank=True, null=True)  # Field name made lowercase.
+    idcategoriafundamento = models.ForeignKey(CategoriaFundamento, models.DO_NOTHING, db_column='idCategoriaFundamento', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'fundamento'
 
 
-class Ratingaluno(models.Model):
+class Avaliacao(models.Model):
     idaluno = models.ForeignKey(Aluno, models.CASCADE, db_column='idAluno', blank=True, null=True)  # Field name made lowercase.
     idfundamento = models.ForeignKey(Fundamento, models.DO_NOTHING, db_column='idFundamento', blank=True, null=True)  # Field name made lowercase.
     idatributo = models.IntegerField(db_column='idAtributo', blank=True, null=True)  # Field name made lowercase.
@@ -50,3 +50,4 @@ class Ratingaluno(models.Model):
     class Meta:
         managed = False
         db_table = 'ratingAluno'
+
