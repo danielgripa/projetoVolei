@@ -10,7 +10,7 @@ from django.db import models
 # Feel free to rename the models, but don't rename db_table values or field names.
 
 
-# Create your models here.
+
 class Aluno(models.Model):
     idaluno = models.AutoField(db_column='idAluno', primary_key=True)  # Field name made lowercase.
     nomealuno = models.CharField(db_column='nomeAluno', max_length=255)  # Field name made lowercase.
@@ -18,8 +18,18 @@ class Aluno(models.Model):
     situacaocadastro = models.CharField(db_column='situacaoCadastro', max_length=50)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'aluno'
+
+
+class AtributoFundamento(models.Model):
+    fk_idfundamento = models.ForeignKey('Fundamento', models.RESTRICT, db_column='fk_idFundamento')  # Field name made lowercase.
+    idatributo = models.IntegerField(db_column='idAtributo', primary_key=True)  # Field name made lowercase.
+    desc_atributofundamento = models.CharField(db_column='desc_atributoFundamento', max_length=45)  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'atributoFundamento'
 
 
 class CategoriaFundamento(models.Model):
@@ -27,27 +37,27 @@ class CategoriaFundamento(models.Model):
     desc_categoriafundamento = models.CharField(db_column='desc_categoriaFundamento', max_length=255)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'categoriaFundamento'
 
 
 class Fundamento(models.Model):
     idfundamento = models.AutoField(db_column='idFundamento', primary_key=True)  # Field name made lowercase.
     desc_fundamento = models.CharField(db_column='desc_Fundamento', max_length=255)  # Field name made lowercase.
-    idcategoriafundamento = models.ForeignKey(CategoriaFundamento, models.DO_NOTHING, db_column='idCategoriaFundamento', blank=True, null=True)  # Field name made lowercase.
+    idcategoriafundamento = models.ForeignKey(CategoriaFundamento, models.SET_NULL, db_column='idCategoriaFundamento', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'fundamento'
 
 
 class Avaliacao(models.Model):
-    idaluno = models.ForeignKey(Aluno, models.CASCADE, db_column='idAluno', blank=True, null=True)  # Field name made lowercase.
-    idfundamento = models.ForeignKey(Fundamento, models.DO_NOTHING, db_column='idFundamento', blank=True, null=True)  # Field name made lowercase.
-    idatributo = models.IntegerField(db_column='idAtributo', blank=True, null=True)  # Field name made lowercase.
+    idaluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, db_column='idAluno')  # ForeignKey para permitir múltiplas avaliações por aluno
+    idatributo = models.ForeignKey(AtributoFundamento, on_delete=models.CASCADE, db_column='idAtributo')
     score = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
-        db_table = 'ratingAluno'
+        managed = True
+        db_table = 'avaliacao'
+        unique_together = (('idaluno', 'idatributo'),)  # Garante a unicidade de cada combinação de aluno e atributo
 

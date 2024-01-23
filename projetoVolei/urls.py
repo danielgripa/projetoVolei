@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.urls import path
-from Avaliacoes.views import alunos,avaliacoes,fundamentos,categoriasFundamento
+from Avaliacoes.views import alunos, avaliacao,fundamentos,categoriasFundamento, atributoFundamento
 
 
 urlpatterns = [
@@ -26,9 +26,9 @@ urlpatterns = [
     path('api/alunos/<int:id>/', alunos.DetalhesAluno.as_view(), name='detalhes_aluno'),
     
     #avaliacoes
-    path('api/avaliacoes/', avaliacoes.ListarAvaliacoes.as_view(), name='listar_avaliacoes'),
-    path('api/avaliacoes/adicionar/', avaliacoes.AdicionarAvaliacao.as_view(), name='adicionar_avaliacao'),
-    path('api/avaliacoes/<int:id>/', avaliacoes.DetalhesAvaliacao.as_view(), name='detalhes_avaliacao'),
+    path('api/avaliacao/', avaliacao.ListarAvaliacoes.as_view(), name='listar_avaliacoes'),
+    path('api/avaliacao/adicionar/', avaliacao.AdicionarAvaliacao.as_view(), name='adicionar_avaliacao'),
+    path('api/avaliacao/<int:id>/', avaliacao.DetalhesAvaliacao.as_view(), name='detalhes_avaliacao'),
 
     #fundamentos
     path('api/fundamentos/', fundamentos.ListarFundamentos.as_view(), name='listar_fundamentos'),
@@ -39,5 +39,11 @@ urlpatterns = [
     path('api/categorias-fundamento/', categoriasFundamento.ListarCategoriasFundamento.as_view(), name='listar_categorias_fundamento'),
     path('api/categorias-fundamento/adicionar/', categoriasFundamento.AdicionarCategoriaFundamento.as_view(), name='adicionar_categoria_fundamento'),
     path('api/categorias-fundamento/<int:id>/', categoriasFundamento.DetalhesCategoriaFundamento.as_view(), name='detalhes_categoria_fundamento'),       
+
+    #atributoFundamento
+        #categoriaFundamentos
+    path('api/atributo-fundamento', atributoFundamento.ListarAtributos.as_view(), name='listar_categorias_fundamento'),
+    path('api/atributo-fundamento/adicionar/', atributoFundamento.AdicionarAtributo.as_view(), name='adicionar_categoria_fundamento'),
+    path('api/atributo-fundamento/<int:id>/', atributoFundamento.DetalhesAtributo.as_view(), name='detalhes_categoria_fundamento'),       
 ]
 
