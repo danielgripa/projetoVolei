@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..models import Fundamento
 from ..serializers import FundamentoSerializer
+from django.http import Http404
 
 class ListarFundamentos(APIView):
     def get(self, request, format=None):
@@ -18,36 +19,42 @@ class AdicionarFundamento(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class DetalhesFundamento(APIView):
+
+class EditarFundamento(APIView):
     def get_object(self, id):
         try:
-            return Fundamento.objects.get(id=id)
+            return Fundamento.objects.get(pk=id)
         except Fundamento.DoesNotExist:
-            return None
-
-    def get(self, request, id, format=None):
-        fundamento = self.get_object(id)
-        if fundamento is not None:
-            serializer = FundamentoSerializer(fundamento)
-            return Response(serializer.data)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404
 
     def put(self, request, id, format=None):
         fundamento = self.get_object(id)
-        if fundamento is not None:
-            serializer = FundamentoSerializer(fundamento, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = FundamentoSerializer(fundamento, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ExcluirFundamento(APIView):
+    def get_object(self, id):
+        try:
+            return Fundamento.objects.get(pk=id)
+        except Fundamento.DoesNotExist:
+            raise Http404
 
     def delete(self, request, id, format=None):
         fundamento = self.get_object(id)
-        if fundamento is not None:
-            fundamento.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        fundamento.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class DetalhesFundamento(APIView):
+    def get_object(self, id):
+        try:
+            return Fundamento.objects.get(pk=id)
+        except Fundamento.DoesNotExist:
+            raise Http404
+
+    def get(self, request, id, format=None):
+        fundamento= self.get_object(id)
+        serializer = FundamentoSerializer(fundamento)
+        return Response(serializer.data)

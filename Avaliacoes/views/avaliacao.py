@@ -1,67 +1,59 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.http import Http404
 from ..models import Avaliacao, Aluno, AtributoFundamento
 from ..serializers import AvaliacaoSerializer
+from django.http import Http404
 
-class RatingAlunoBaseView(APIView):
-    """
-    Classe base para views de RatingAluno.
-    Contém métodos comuns para validação e recuperação de objetos.
-    """
-    def validate_and_get_aluno(self, idAluno):
-        try:
-            return Aluno.objects.get(pk=idAluno)
-        except Aluno.DoesNotExist:
-            raise Http404("Aluno não encontrado.")
+class ListarAvaliacoes(APIView):
+    def get(self, request, format=None):
+        avaliacoes = Avaliacao.objects.all()
+        serializer = AvaliacaoSerializer(avaliacoes, many=True)
+        return Response(serializer.data)
 
-    def validate_and_get_atributo(self, idAtributo):
+class DetalhesAvaliacao(APIView):
+    def get_object(self, idaluno, idatributo):
         try:
-            return AtributoFundamento.objects.get(pk=idAtributo)
-        except AtributoFundamento.DoesNotExist:
-            raise Http404("Atributo de Fundamento não encontrado.")
-
-    def get_ratingaluno(self, idAluno, idAtributo):
-        try:
-            return Avaliacao.objects.get(idAluno=idAluno, idatributo=idAtributo)
+            return Avaliacao.objects.get(idaluno=idaluno, idatributo=idatributo)
         except Avaliacao.DoesNotExist:
-            raise Http404("Avaliação de Aluno não encontrada.")
+            raise Http404
 
-class AdicionarAvaliacao(RatingAlunoBaseView):
+    def get(self, request, idaluno, idatributo, format=None):
+        avaliacao = self.get_object(idaluno, idatributo)
+        serializer = AvaliacaoSerializer(avaliacao)
+        return Response(serializer.data)
+
+class AdicionarAvaliacao(APIView):
     def post(self, request, format=None):
-        self.validate_and_get_aluno(request.data.get('idAluno'))
-        self.validate_and_get_atributo(request.data.get('idAtributo'))
-
         serializer = AvaliacaoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ListarAvaliacoes(RatingAlunoBaseView):
-    def get(self, request, format=None):
-        ratingalunos = Avaliacao.objects.all()
-        serializer = AvaliacaoSerializer(ratingalunos, many=True)
-        return Response(serializer.data)
+class EditarAvaliacao(APIView):
+    def get_object(self, idaluno, idatributo):
+        try:
+            return Avaliacao.objects.get(idaluno=idaluno, idatributo=idatributo)
+        except Avaliacao.DoesNotExist:
+            raise Http404
 
-class DetalhesAvaliacao(RatingAlunoBaseView):
-    def get(self, request, idAluno, idAtributo, format=None):
-        ratingaluno = self.get_ratingaluno(idAluno, idAtributo)
-        serializer = AvaliacaoSerializer(ratingaluno)
-        return Response(serializer.data)
-
-class EditarAvaliacao(RatingAlunoBaseView):
-    def put(self, request, idAluno, idAtributo, format=None):
-        ratingaluno = self.get_ratingaluno(idAluno, idAtributo)
-        serializer = AvaliacaoSerializer(ratingaluno, data=request.data)
+    def put(self, request, idaluno, idatributo, format=None):
+        avaliacao = self.get_object(idaluno, idatributo)
+        serializer = AvaliacaoSerializer(avaliacao, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ExcluirAvaliacao(RatingAlunoBaseView):
-    def delete(self, request, idAluno, idAtributo, format=None):
-        ratingaluno = self.get_ratingaluno(idAluno, idAtributo)
-        ratingaluno.delete()
+class ExcluirAvaliacao(APIView):
+    def get_object(self, idaluno, idatributo):
+        try:
+            return Avaliacao.objects.get(idaluno=idaluno, idatributo=idatributo)
+        except Avaliacao.DoesNotExist:
+            raise Http404
+
+    def delete(self, request, idaluno, idatributo, format=None):
+        avaliacao = self.get_object(idaluno, idatributo)
+        avaliacao.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

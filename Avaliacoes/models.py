@@ -23,7 +23,7 @@ class Aluno(models.Model):
 
 
 class AtributoFundamento(models.Model):
-    fk_idfundamento = models.ForeignKey('Fundamento', models.RESTRICT, db_column='fk_idFundamento')  # Field name made lowercase.
+    fk_idfundamento = models.ForeignKey('Fundamento', models.SET_NULL, db_column='fk_idFundamento', blank=True, null=True)  # Field name made lowercase.
     idatributo = models.IntegerField(db_column='idAtributo', primary_key=True)  # Field name made lowercase.
     desc_atributofundamento = models.CharField(db_column='desc_atributoFundamento', max_length=45)  # Field name made lowercase.
 
