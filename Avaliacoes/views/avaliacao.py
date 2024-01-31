@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from ..models import Avaliacao, Aluno, AtributoFundamento
+from ..models import Avaliacao
 from ..serializers import AvaliacaoSerializer
 from django.http import Http404
 

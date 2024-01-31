@@ -1,25 +1,28 @@
 from django.db import models
-
-
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
+from django.contrib.auth.models import User
 
 
 
 class Aluno(models.Model):
-    idaluno = models.AutoField(db_column='idAluno', primary_key=True)  # Field name made lowercase.
-    nomealuno = models.CharField(db_column='nomeAluno', max_length=255)  # Field name made lowercase.
+    #Associando como usuario do app
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    #Cammpos da tabela
     datainiciotreino = models.DateField(db_column='dataInicioTreino', blank=True, null=True)  # Field name made lowercase.
-    situacaocadastro = models.CharField(db_column='situacaoCadastro', max_length=50)  # Field name made lowercase.
 
     class Meta:
         managed = True
         db_table = 'aluno'
+
+
+class Professor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    # Outros campos específicos de professor
+
+    class Meta:
+        managed = True
+        db_table = 'professor'
+
 
 
 class AtributoFundamento(models.Model):
@@ -61,3 +64,49 @@ class Avaliacao(models.Model):
         db_table = 'avaliacao'
         unique_together = (('idaluno', 'idatributo'),)  # Garante a unicidade de cada combinação de aluno e atributo
 
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_professor = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+    
+    
+class Escola(models.Model):
+    nome = models.CharField(max_length=100)
+    endereco = models.TextField()
+
+    def __str__(self):
+        return self.nome
+
+class Quadra(models.Model):
+    identificacao = models.CharField(max_length=100)
+    escola = models.ForeignKey(Escola, related_name='quadras', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.identificacao
+
+class Turma(models.Model):
+    descricao = models.CharField(max_length=200)
+    professores = models.ManyToManyField(User, related_name='turmas')
+    alunos = models.ManyToManyField(User, related_name='turmas_aluno')
+    quadra = models.ForeignKey(Quadra, related_name='turmas', on_delete=models.SET_NULL, null=True)
+    escola = models.ForeignKey(Escola, related_name='turmas', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.descricao
+
+class Aula(models.Model):
+    turma = models.ForeignKey(Turma, related_name='aulas', on_delete=models.CASCADE)
+    quadra = models.ForeignKey(Quadra, related_name='aulas', on_delete=models.CASCADE)
+    escola = models.ForeignKey(Escola, related_name='aulas', on_delete=models.CASCADE)
+    data = models.DateField()
+    horario_inicio = models.TimeField()
+    duracao = models.DurationField()
+
+    def __str__(self):
+        return f"{self.turma} - {self.data} - {self.horario_inicio}"
+    
+
+#TODO: Avaliar de qual Model vamos retirar o campo Quadra. Acho que não é necessário ter em algum dos dois.

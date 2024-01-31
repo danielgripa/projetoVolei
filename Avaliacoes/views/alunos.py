@@ -1,30 +1,42 @@
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from ..models import Aluno
-from ..serializers import AlunoSerializer
 from django.http import Http404
+from ..models import Aluno
+from ..serializers import AlunoSerializer, UserSerializer
+
 
 class AdicionarAluno(APIView):
     def post(self, request, format=None):
-        serializer = AlunoSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_serializer = UserSerializer(data=request.data.get('user'))
+        aluno_serializer = AlunoSerializer(data=request.data.get('aluno'))
+
+        if user_serializer.is_valid() and aluno_serializer.is_valid():
+            user = user_serializer.save()
+            aluno = aluno_serializer.save(user=user)
+            return Response({
+                'user': UserSerializer(user).data,
+                'aluno': AlunoSerializer(aluno).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            errors = user_serializer.errors
+            errors.update(aluno_serializer.errors)
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class ListarAlunos(APIView):
     def get(self, request, format=None):
-        alunos = Aluno.objects.all()
+        alunos = Aluno.objects.select_related('user').all()
         serializer = AlunoSerializer(alunos, many=True)
         return Response(serializer.data)
-    
-    
+
 class DetalhesAluno(APIView):
     def get_object(self, id):
         try:
-            return Aluno.objects.get(pk=id)
+            return Aluno.objects.select_related('user').get(pk=id)
         except Aluno.DoesNotExist:
             raise Http404
 
@@ -32,8 +44,6 @@ class DetalhesAluno(APIView):
         aluno = self.get_object(id)
         serializer = AlunoSerializer(aluno)
         return Response(serializer.data)
-
-
 
 class EditarAluno(APIView):
     def get_object(self, id):
@@ -44,11 +54,20 @@ class EditarAluno(APIView):
 
     def put(self, request, id, format=None):
         aluno = self.get_object(id)
-        serializer = AlunoSerializer(aluno, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_serializer = UserSerializer(aluno.user, data=request.data.get('user'))
+        aluno_serializer = AlunoSerializer(aluno, data=request.data.get('aluno'))
+
+        if user_serializer.is_valid() and aluno_serializer.is_valid():
+            user_serializer.save()
+            aluno_serializer.save()
+            return Response({
+                'user': user_serializer.data,
+                'aluno': aluno_serializer.data
+            })
+        else:
+            errors = user_serializer.errors
+            errors.update(aluno_serializer.errors)
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ExcluirAluno(APIView):
@@ -60,5 +79,6 @@ class ExcluirAluno(APIView):
 
     def delete(self, request, id, format=None):
         aluno = self.get_object(id)
-        aluno.delete()
+        aluno.user.delete()  # Isto também exclui o aluno devido ao on_delete=models.CASCADE
         return Response(status=status.HTTP_204_NO_CONTENT)
+
