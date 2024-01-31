@@ -109,4 +109,3 @@ class Aula(models.Model):
         return f"{self.turma} - {self.data} - {self.horario_inicio}"
     
 
-#TODO: Avaliar de qual Model vamos retirar o campo Quadra. Acho que não é necessário ter em algum dos dois.
